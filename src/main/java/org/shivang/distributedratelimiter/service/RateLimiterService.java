@@ -5,6 +5,8 @@ import org.shivang.distributedratelimiter.Algorithm.RedisTokenBucket;
 import org.shivang.distributedratelimiter.RateLimiterResult;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RateLimiterService {
@@ -12,10 +14,16 @@ public class RateLimiterService {
 
 
     public RateLimiterResult getRateLimiterResult(String key) {
-        RateLimiterResult result = new RateLimiterResult();
-        result.setRequestAllowed(tokenBucket.isRequestAllowed(key));
-        result.setLimit(tokenBucket.getCapacity());
-        result.setRemainingTokens(tokenBucket.getCurrentTokens(key));
-        return result;
+        List<Object> result = tokenBucket.isRequestAllowed(key);
+        boolean allowed = Long.parseLong(result.get(0).toString()) ==1;
+        double remainingTokens = Double.parseDouble(result.get(1).toString());
+
+        RateLimiterResult response = new RateLimiterResult();
+
+        response.setRequestAllowed(allowed);
+        response.setLimit(tokenBucket.getCapacity());
+        response.setRemainingTokens(remainingTokens);
+
+        return response;
     }
 }
