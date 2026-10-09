@@ -113,85 +113,6 @@ was not allowed.
 -   `GET /api/rate-limiter/limit-rate` --- rate-limit endpoint used
     during development/testing.
 
-## Run Locally
-
-### Prerequisites
-
--   Java 21
--   Maven
--   Docker Engine and Docker Compose
--   Redis, either through Docker Compose or a local Redis instance
-
-### 1. Build the application
-
-From the project root:
-
-``` bash
-mvn clean package
-```
-
-### 2. Start Redis for local application testing
-
-If you are running the Spring Boot application directly on your host:
-
-``` bash
-docker run -d --name rate-limiter-redis -p 6379:6379 redis:7
-```
-
-If a container with that name already exists, start it instead:
-
-``` bash
-docker start rate-limiter-redis
-```
-
-Make sure the local profile/configuration points to `localhost:6379`.
-
-### 3. Run Spring Boot
-
-``` bash
-java -jar target/*.jar
-```
-
-Then send a request:
-
-``` bash
-curl -i \
-  -H "X-User-Id: user-123" \
-  http://localhost:8080/api/rate-limiter/response
-```
-
-## Run the Full Docker Compose Stack
-
-The Compose setup runs Redis, three application instances, Nginx,
-Prometheus, Grafana, and Redis Exporter. In the Compose network,
-application instances connect to Redis using the service hostname
-`redis`, not `localhost`.
-
-Build the application image first if your Compose file references
-`image: distributed-rate-limiter:latest` without a `build:` section:
-
-``` bash
-mvn clean package
-docker build -t distributed-rate-limiter:latest .
-docker compose up -d
-```
-
-Check service status and logs:
-
-``` bash
-docker compose ps
-docker compose logs -f app1 app2 app3
-docker compose logs -f nginx
-```
-
-The local URLs are:
-
-Service                      URL
-  ---------------------------- -------------------------
-Rate limiter through Nginx   `http://localhost:8080`
-Prometheus                   `http://localhost:9090`
-Grafana                      `http://localhost:3000`
-
 Use the same API request through Nginx:
 
 ``` bash
@@ -199,18 +120,6 @@ curl -i \
   -H "X-User-Id: user-123" \
   http://localhost:8080/api/rate-limiter/response
 ```
-
-If you change application code or configuration baked into the image,
-rebuild and recreate the app containers:
-
-``` bash
-mvn clean package
-docker build -t distributed-rate-limiter:latest .
-docker compose up -d --no-deps --force-recreate app1 app2 app3
-```
-
-The exact service names and host port mappings should match your local
-`docker-compose.yml`.
 
 ## Test Rate-Limit Rejections
 
@@ -326,5 +235,85 @@ check that the bucket metric and labels exist.
 ├── docker-compose.yml
 └── README.md
 ```
+
+## Run Locally
+
+### Prerequisites
+
+-   Java 21
+-   Maven
+-   Docker Engine and Docker Compose
+-   Redis, either through Docker Compose or a local Redis instance
+
+### 1. Build the application
+
+From the project root:
+
+``` bash
+mvn clean package
+```
+
+### 2. Start Redis for local application testing
+
+If you are running the Spring Boot application directly on your host:
+
+``` bash
+docker run -d --name rate-limiter-redis -p 6379:6379 redis:7
+```
+
+If a container with that name already exists, start it instead:
+
+``` bash
+docker start rate-limiter-redis
+```
+
+Make sure the local profile/configuration points to `localhost:6379`.
+
+### 3. Run Spring Boot
+
+``` bash
+java -jar target/*.jar
+```
+
+Then send a request:
+
+``` bash
+curl -i \
+  -H "X-User-Id: user-123" \
+  http://localhost:8080/api/rate-limiter/response
+```
+
+## Run the Full Docker Compose Stack
+
+The Compose setup runs Redis, three application instances, Nginx,
+Prometheus, Grafana, and Redis Exporter. In the Compose network,
+application instances connect to Redis using the service hostname
+`redis`, not `localhost`.
+
+Build the application image first if your Compose file references
+`image: distributed-rate-limiter:latest` without a `build:` section:
+
+``` bash
+mvn clean package
+docker build -t distributed-rate-limiter:latest .
+docker compose up -d
+```
+
+Check service status and logs:
+
+``` bash
+docker compose ps
+docker compose logs -f app1 app2 app3
+docker compose logs -f nginx
+```
+
+The local URLs are:
+
+Service                      URL
+  ---------------------------- -------------------------
+Rate limiter through Nginx   `http://localhost:8080`
+Prometheus                   `http://localhost:9090`
+Grafana                      `http://localhost:3000`
+
 
 
