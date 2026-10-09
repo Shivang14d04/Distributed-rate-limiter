@@ -171,11 +171,11 @@ rate(http_server_requests_seconds_count{uri!="/actuator/prometheus"}[1m])
 rate(http_server_requests_seconds_count{status="429",uri="/api/rate-limiter/response"}[1m])
 ```
 
-**P99 request latency**
+**P95 request latency**
 
 ``` promql
 histogram_quantile(
-  0.99,
+  0.95,
   sum by (le) (
     rate(http_server_requests_seconds_bucket{
       uri="/api/rate-limiter/response"
