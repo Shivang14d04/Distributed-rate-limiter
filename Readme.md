@@ -104,9 +104,7 @@ was not allowed.
 
 > Send the same `X-User-Id` on each request to consume the same bucket.
 > A different user ID maps to a different Redis key and therefore a
-> separate bucket. Use trusted authentication identity in a production
-> deployment; do not rely on an arbitrary client-controlled header as
-> proof of identity.
+> separate bucket. 
 
 ### Other endpoint
 
@@ -121,32 +119,6 @@ curl -i \
   http://localhost:8080/api/rate-limiter/response
 ```
 
-## Test Rate-Limit Rejections
-
-The configured bucket starts with 50 tokens and refills at 2 tokens per
-second. The following sends a burst of 100 requests for one user and
-summarizes the HTTP status codes:
-
-``` bash
-for i in {1..100}; do
-  curl -s -o /dev/null -w "%{http_code}\n" \
-    -H "X-User-Id: rejection-test-1" \
-    http://localhost:8080/api/rate-limiter/response
-done | sort | uniq -c
-```
-
-Expected behavior: requests are allowed while tokens are available;
-requests are rejected with `429` when the bucket is empty. Exact counts
-can vary due to token refill during the test and existing state for that
-user. Use a fresh user ID for a clean run.
-
-To check user isolation, send a request with a different ID:
-
-``` bash
-curl -i \
-  -H "X-User-Id: another-user" \
-  http://localhost:8080/api/rate-limiter/response
-```
 
 ## Monitoring and Observability
 
