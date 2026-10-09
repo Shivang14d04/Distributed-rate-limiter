@@ -15,11 +15,11 @@ public class RateLimiterController {
     private final RateLimiterService rateLimiterService;
 
     @GetMapping("/response")
-    public ResponseEntity<RateLimiterResult> response() {
-        String key = "test-user";
+    public ResponseEntity<RateLimiterResult> response(@RequestHeader("X-User-Id") String userId) {
+
 
         RateLimiterResult result =
-                rateLimiterService.getRateLimiterResult(key);
+                rateLimiterService.getRateLimiterResult(userId);
 
         if (result.isRequestAllowed()) {
             return ResponseEntity

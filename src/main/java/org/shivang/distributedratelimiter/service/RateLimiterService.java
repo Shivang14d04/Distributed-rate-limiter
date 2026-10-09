@@ -13,7 +13,8 @@ public class RateLimiterService {
     private final RedisTokenBucket tokenBucket;
 
 
-    public RateLimiterResult getRateLimiterResult(String key) {
+    public RateLimiterResult getRateLimiterResult(String userId) {
+        String key = "rate_limit:user:"+userId;
         List<Object> result = tokenBucket.isRequestAllowed(key);
         boolean allowed = Long.parseLong(result.get(0).toString()) ==1;
         double remainingTokens = Double.parseDouble(result.get(1).toString());

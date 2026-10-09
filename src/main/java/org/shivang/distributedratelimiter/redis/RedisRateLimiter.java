@@ -67,10 +67,6 @@ public class RedisRateLimiter {
         return {allowed, currentTokens}
         """;
 
-    public void saveState(String key, double currentTokens, long lastRefillTime){
-        redisTemplate.opsForHash().put(key, "currentTokens", currentTokens);
-        redisTemplate.opsForHash().put(key, "lastRefillTime", lastRefillTime);
-    }
 
     public Map<Object,Object> getState(String key){
       return   redisTemplate.opsForHash().entries(key);
